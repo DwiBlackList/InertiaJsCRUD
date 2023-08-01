@@ -20,7 +20,7 @@ class PostController extends Controller
     public function index()
     {
         $data = Post::all();
-        return Inertia::render('posts', ['data' => $data]);
+        return Inertia::render('Posts', ['data' => $data]);
     }
 
     /**
