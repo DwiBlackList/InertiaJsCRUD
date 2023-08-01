@@ -31,14 +31,17 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        Validator::make($request->all(), [
-            'title' => ['required'],
-            'body' => ['required'],
-        ])->validate();
-        Post::create($request->all());
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
 
-        return redirect()->back()
-            ->with('message', 'Post Created Successfully.');
+        $post = Post::create([
+            'title' => $request->input('title'),
+            'body' => $request->input('body'),
+        ]);
+
+        return response()->json($post, 201);
     }
 
     /**
@@ -67,11 +70,15 @@ class PostController extends Controller
      * @return Response
      */
 
-    public function destroy(Request $request)
+    public function destroy(Request $request , $id)
     {
-        if ($request->has('id')) {
-            Post::find($request->input('id'))->delete();
-            return redirect()->back();
-        }
+        // if ($request->has('id')) {
+        //     Post::find($request->input('id'))->delete();
+        //     // return redirect()->back();
+        // }
+        $delete = Post::find($id);
+        $delete->delete();
+        return redirect()->back();
+        // dd($delete);
     }
 }
