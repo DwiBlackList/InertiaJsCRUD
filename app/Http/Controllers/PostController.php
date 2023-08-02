@@ -33,7 +33,7 @@ class PostController extends Controller
 
     public function index()
     {
-        $data = Post::with('user')->get();
+        $data = Post::with('user')->where('user_id' , '=' , Auth::user()->id)->get();
         return Inertia::render('Posts', ['data' => $data]);
     }
 
