@@ -90,6 +90,17 @@ const filteredPosts = computed(() => {
     );
   });
 });
+
+// Function to format the date as only the date
+function formatDate(timestamp) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(timestamp).toLocaleDateString(undefined, options);
+}
+
+// Function to format the date as only the time
+function formatTime(timestamp) {
+  return new Date(timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+}
 </script>
 
 <template>
@@ -143,7 +154,8 @@ const filteredPosts = computed(() => {
             <p>ID : {{ post.id }}</p>
             <p>Title : {{ post.title }}</p>
             <p>Body : {{ post.body }}</p>
-            <p>Create : {{ post.created_at }}</p>
+            <p>Date Created : {{ formatDate(post.created_at) }}</p>
+            <p>Time Created : {{ formatTime(post.created_at) }}</p>
             <p>Created by : {{ post.user.name }}</p>
 
             <PrimaryButton @click="editPost(post)">Edit</PrimaryButton>
@@ -161,7 +173,7 @@ const filteredPosts = computed(() => {
       <teleport to="body">
         <div v-if="editedPost.id !== null" class="fixed inset-0 flex items-center justify-center">
           <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold mb-4">Edit Post</h3>
+            <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300 ">Edit Post</h3>
             <form @submit.prevent="updatePost">
               <div class="mb-4">
                 <label for="edit-title" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
