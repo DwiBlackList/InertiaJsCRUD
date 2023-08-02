@@ -142,6 +142,7 @@ function closeModal() {
             <p>Title : {{ post.title }}</p>
             <p>Body : {{ post.body }}</p>
             <p>Create : {{ post.created_at }}</p>
+            <p>Created by : {{ post.user.name }}</p>
 
             <PrimaryButton @click="editPost(post)">Edit</PrimaryButton>
             <SecondaryButton @click="destroy(post.id)">Delete</SecondaryButton>
