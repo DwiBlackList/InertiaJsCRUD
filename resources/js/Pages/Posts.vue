@@ -2,7 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Import 'defineProps' from Vue to access the 'data' prop
-import { defineProps, reactive, onMounted } from 'vue';
+import { defineProps, reactive, onMounted , ref , computed } from 'vue';
 
 import { Inertia } from '@inertiajs/inertia'
 
@@ -53,29 +53,6 @@ function editPost(post) {
   editedPost.body = post.body;
 }
 
-
-
-
-// const formedit = useForm({
-//   title: '',
-//   body: '',
-// });
-
-// function updatePost() {
-//   let title = editedPost.title;
-//   let body = editedPost.body;
-
-//   formedit.put(`/posts/${editedPost.id}`, {
-//     title: title,
-//     body: body
-//   }).then(() => {
-//     fetchData(); // Refresh the data
-//     closeModal(); // Close the modal after updating
-//   }).catch(error => {
-//     console.error('Error updating post:', error);
-//   });
-// }
-
 function updatePost() {
 
   //define variable 
@@ -95,6 +72,24 @@ function closeModal() {
   editedPost.title = '';
   editedPost.body = '';
 }
+
+// filter data
+const searchQuery = ref('');
+
+// Create a computed property to filter posts based on the search query
+const filteredPosts = computed(() => {
+  if (!searchQuery.value) {
+    return props.data; // Return all posts if search query is empty
+  }
+
+  const query = searchQuery.value.toLowerCase();
+  return props.data.filter(post => {
+    return (
+      post.title.toLowerCase().includes(query) ||
+      post.body.toLowerCase().includes(query)
+    );
+  });
+});
 </script>
 
 <template>
@@ -130,9 +125,16 @@ function closeModal() {
         </div>
       </div>
     </div>
-
+    <!-- Search bar -->
+    <div class="py-12">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg text-white">
+          <TextInput id="title" v-model="searchQuery" type="text" class="mt-1 block w-full" placeholder="Searc Posts..."/>
+        </div>
+      </div>
+    </div>
     <!-- read data -->
-    <div v-for="post in data" :key="post.id">
+    <div v-for="post in filteredPosts" :key="post.id">
       <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg text-white">
