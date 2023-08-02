@@ -5,12 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Post;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 
 {
+    public function welcome()
+    {
+        $data = Post::with('user')->get();
+        return Inertia::render('Welcome', [
+            'data' => $data,
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
