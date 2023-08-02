@@ -2,7 +2,9 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 // Import 'defineProps' from Vue to access the 'data' prop
-import { defineProps } from 'vue';
+import { defineProps, reactive, onMounted } from 'vue';
+
+import { Inertia } from '@inertiajs/inertia'
 
 // Define the 'data' prop
 const props = defineProps({
@@ -26,17 +28,72 @@ const form = useForm({
 });
 
 const submit = () => {
-  form.post(route('posts.store'), {
-    onFinish: () => form.reset('password', 'password_confirmation'),
-  });
+  form.post(route('posts.store'));
 };
-
 
 // delete
 function destroy(id) {
-    if (confirm("Are you sure you want to Delete")) {
-        form.delete(route('posts.destroy', id));
-    }
+  if (confirm("Are you sure you want to Delete")) {
+    form.delete(route('posts.destroy', id));
+  }
+}
+
+// edit
+// Define the 'editedPost' reactive property to store the edited post data
+const editedPost = reactive({
+  id: null,
+  title: '',
+  body: '',
+});
+
+// Function to open the modal for editing a post
+function editPost(post) {
+  editedPost.id = post.id;
+  editedPost.title = post.title;
+  editedPost.body = post.body;
+}
+
+
+
+
+// const formedit = useForm({
+//   title: '',
+//   body: '',
+// });
+
+// function updatePost() {
+//   let title = editedPost.title;
+//   let body = editedPost.body;
+
+//   formedit.put(`/posts/${editedPost.id}`, {
+//     title: title,
+//     body: body
+//   }).then(() => {
+//     fetchData(); // Refresh the data
+//     closeModal(); // Close the modal after updating
+//   }).catch(error => {
+//     console.error('Error updating post:', error);
+//   });
+// }
+
+function updatePost() {
+
+  //define variable 
+  let title = editedPost.title
+  let body = editedPost.body
+
+  //send data
+  Inertia.put(`/posts/${editedPost.id}`, {
+    title: title,
+    body: body
+  })
+
+}
+
+function closeModal() {
+  editedPost.id = null;
+  editedPost.title = '';
+  editedPost.body = '';
 }
 </script>
 
@@ -73,6 +130,7 @@ function destroy(id) {
         </div>
       </div>
     </div>
+
     <!-- read data -->
     <div v-for="post in data" :key="post.id">
       <div class="py-12">
@@ -84,16 +142,52 @@ function destroy(id) {
             <p>Title : {{ post.title }}</p>
             <p>Body : {{ post.body }}</p>
             <p>Create : {{ post.created_at }}</p>
-            
-            <PrimaryButton><Link :href="route('posts.edit' , post.id)" class="">Edit</Link></PrimaryButton>
+
+            <PrimaryButton @click="editPost(post)">Edit</PrimaryButton>
             <SecondaryButton @click="destroy(post.id)">Delete</SecondaryButton>
-            
+
             <!-- Display other properties as needed -->
-            
-            
+
+
           </div>
         </div>
       </div>
+
+      <!-- Modal Edit -->
+      <!-- Edit Modal -->
+      <teleport to="body">
+        <div v-if="editedPost.id !== null" class="fixed inset-0 flex items-center justify-center">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-4">Edit Post</h3>
+            <form @submit.prevent="updatePost">
+              <div class="mb-4">
+                <label for="edit-title" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                  Title
+                </label>
+                <input type="text" id="edit-title" v-model="editedPost.title" class="form-input mt-1 block w-full"
+                  required />
+              </div>
+              <div class="mb-4">
+                <label for="edit-body" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
+                  Body
+                </label>
+                <textarea id="edit-body" v-model="editedPost.body" class="form-textarea mt-1 block w-full" rows="4"
+                  required></textarea>
+              </div>
+              <div class="flex items-center justify-end mt-4">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Save Changes
+                </button>
+                <button type="button" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded"
+                  @click="closeModal">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </teleport>
+
     </div>
   </AppLayout>
 </template>

@@ -41,7 +41,9 @@ class PostController extends Controller
             'body' => $request->input('body'),
         ]);
 
-        return response()->json($post, 201);
+        if($post) {
+            return redirect()->route('posts.index');
+        }
     }
 
     /**
@@ -50,18 +52,24 @@ class PostController extends Controller
      * @return Response
      */
 
-    public function update(Request $request)
+    public function update(Request $request, Post $post)
     {
-        Validator::make($request->all(), [
-            'title' => ['required'],
-            'body' => ['required'],
-        ])->validate();
+        //set validation
+        $request->validate([
+            'title'   => 'required',
+            'body' => 'required',
+        ]);
 
-        if ($request->has('id')) {
-            Post::find($request->input('id'))->update($request->all());
-            return redirect()->back()
-                ->with('message', 'Post Updated Successfully.');
+        //update post
+        $post->update([
+            'title'     => $request->title,
+            'body'   => $request->body
+        ]);
+
+        if($post) {
+            return redirect()->back();
         }
+        // dd('test');
     }
 
     /**
