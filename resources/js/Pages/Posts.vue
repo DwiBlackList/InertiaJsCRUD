@@ -7,7 +7,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 // Import 'defineProps' from Vue to access the 'data' prop
 import { defineProps, reactive, onMounted, ref, computed } from 'vue';
 
-import { Inertia } from '@inertiajs/inertia'
+import { Inertia } from '@inertiajs/inertia';
 
 // Define the 'data' prop
 const props = defineProps({

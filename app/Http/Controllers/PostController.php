@@ -16,6 +16,7 @@ class PostController extends Controller
     public function welcome()
     {
         $data = Post::with('user')->get();
+        // dd($data);
         return Inertia::render('Welcome', [
             'data' => $data,
             'canLogin' => Route::has('login'),
