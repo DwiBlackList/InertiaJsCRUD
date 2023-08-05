@@ -109,11 +109,11 @@ function formatTime(timestamp) {
                                                     <div class="flex items-center">
                                                         <a class="block mr-2 shrink-0" href="#0">
                                                             <img class="rounded-full border-2 border-white dark:border-slate-800 box-content"
-                                                                src="" width="32" height="32" alt="User 04" />
+                                                                src="../../images/defaultdark.jpg" width="32" height="32" alt="User 04" />
                                                         </a>
                                                         <a class="block text-sm font-semibold text-slate-800 dark:text-slate-100"
                                                             href="#0">
-                                                            <!-- {{ post.user.name }} -->
+                                                            {{ post.user.name }}
                                                         </a>
                                                     </div>
                                                     <div class="text-slate-400 dark:text-slate-600">·</div>

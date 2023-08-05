@@ -3,9 +3,14 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 
+// import Sidebar from '@/Components/Sidebar.vue';
+import Header from '@/Components/Header.vue';
+import ModalBlank from '@/Components/ModalBlank.vue';
+import PaginationClassic from '@/Components/PaginationClassic.vue';
+
 
 // Import 'defineProps' from Vue to access the 'data' prop
-import { defineProps, reactive, onMounted, ref, computed } from 'vue';
+import { reactive, onMounted, ref, computed } from 'vue';
 
 import { Inertia } from '@inertiajs/inertia';
 
@@ -35,11 +40,54 @@ const submit = () => {
 };
 
 // delete
-function destroy(id) {
-  if (confirm("Are you sure you want to Delete")) {
-    form.delete(route('posts.destroy', id));
+// function destroy(id) {
+//   if (confirm("Are you sure you want to Delete")) {
+//     form.delete(route('posts.destroy', id));
+//   }
+// }
+// Define a reactive property to track if the delete modal is open
+const dangerModalOpen = ref(false);
+
+let postIdToDelete = null; // Store the post ID to delete
+let postTitleToDelete = null; // Store the post ID to delete
+
+let modalPost = ref({
+  id: null,
+  title: ''
+});
+
+// Function to open the delete modal and store the post ID
+function openDeleteModal(postId , postTitle) {
+  dangerModalOpen.value = true; // Open the modal
+  // postTitleToDelete = postTitle; // Store the post ID
+  // postIdToDelete = postId; // Store the post ID
+  modalPost.value.id = postId;
+  modalPost.value.title = postTitle;
+}
+
+// Function to delete the post
+function deletePost() {
+  console.log('Deleting post:', modalPost.value.id);
+  if (modalPost.value.id) {
+    form.delete(route('posts.destroy', modalPost.value.id)).then(() => {
+      fetchData(); // Refresh the data
+      dangerModalOpen.value = false; // Close the modal after deleting
+    }).catch(error => {
+      console.error('Error deleting post:', error);
+    });
   }
 }
+
+function closeDeleteModal() {
+  dangerModalOpen.value = false;
+}
+
+function deletePostAndCloseModal() {
+  deletePost(); // Delete the post
+  closeDeleteModal(); // Close the modal
+}
+
+
 
 // edit
 // Define the 'editedPost' reactive property to store the edited post data
@@ -104,9 +152,11 @@ function formatDate(timestamp) {
 function formatTime(timestamp) {
   return new Date(timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
+
+// const sidebarOpen = ref(true)
 </script>
 
-<template>
+<!-- <template>
   <AppLayout title="Posts">
     <template #header>
       <div class="flex justify-between">
@@ -116,16 +166,11 @@ function formatTime(timestamp) {
           </h2>
 
         </div>
-        <!-- Search bar -->
-        <!-- <div class="py-12"> -->
-        <!-- <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg text-white">
           <TextInput id="title" v-model="searchQuery" type="text" class="mt-1 block w-full"
             placeholder="Search Posts..." />
         </div>
       </div>
-      <!-- </div> -->
-      <!-- </div> -->
     </template>
 
     <div class="max-w-7xl py-12 sm:px-6 lg:px-8 mt-5 mx-auto bg-gray-800 p-6 rounded shadow-md">
@@ -150,7 +195,7 @@ function formatTime(timestamp) {
       </form>
     </div>
 
-    <!-- read data -->
+   
 
     <div v-for="post in filteredPosts" :key="post.id">
       <div class="max-w-7xl mx-auto p-6 lg:p-8">
@@ -159,13 +204,6 @@ function formatTime(timestamp) {
             <div
               class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
               <div class="w-full">
-                <!-- <div class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                                    </svg>
-                                </div> 
-                              
-                              -->
                 <div class="flex justify-between">
 
                   <div>
@@ -221,16 +259,11 @@ function formatTime(timestamp) {
                 </div>
                 </p>
               </div>
-              <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
-                            </svg> -->
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Modal Edit -->
-      <!-- Edit Modal -->
       <teleport to="body">
         <div v-if="editedPost.id !== null" class="fixed inset-0 flex items-center justify-center">
           <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-1/2">
@@ -259,35 +292,169 @@ function formatTime(timestamp) {
               </form>
 
             </div>
-
-
-            <!-- <div class="mb-4">
-                <label for="edit-title" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
-                  Title
-                </label>
-                <input type="text" id="edit-title" v-model="editedPost.title" class="form-input mt-1 block w-full"
-                  required />
-              </div>
-              <div class="mb-4">
-                <label for="edit-body" class="block text-gray-700 dark:text-gray-300 font-bold mb-2">
-                  Body
-                </label>
-                <textarea id="edit-body" v-model="editedPost.body" class="form-textarea mt-1 block w-full" rows="4"
-                  required></textarea>
-              </div>
-              <div class="flex items-center justify-end mt-4">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                  Save Changes
-                </button>
-                <button type="button" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded"
-                  @click="closeModal">
-                  Cancel
-                </button>
-              </div> -->
           </div>
         </div>
       </teleport>
 
     </div>
   </AppLayout>
+</template> -->
+
+<template>
+  <div class="flex h-[100dvh] overflow-hidden">
+
+    <!-- Sidebar -->
+
+    <!-- Content area -->
+    <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden bg-white dark:bg-slate-900">
+
+      <!-- Site header -->
+      <Header/>
+
+      <main class="grow">
+        <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+
+          <!-- Page header -->
+          <div class="sm:flex sm:justify-between sm:items-center mb-8">
+
+            <!-- Left: Title -->
+            <div class="mb-4 sm:mb-0">
+              <h1 class="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold">Your Post ✨</h1>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+
+              <!-- Add board button -->
+              <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white">
+                <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                  <path
+                    d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z" />
+                </svg>
+                <span class="ml-2">Add Post</span>
+              </button>
+
+            </div>
+
+          </div>
+
+          <div class="border-t border-slate-200 dark:border-slate-700">
+            <div class="max-w-3xl m-auto mt-8">
+
+              <!-- Filters -->
+
+              <!-- Posts -->
+              <div class="">
+                <!-- Post -->
+                <article class="pt-6" v-for="post in filteredPosts" :key="post.id">
+                  <div class="xl:flex">
+                    <div class="w-32 shrink-0">
+                      <div class="text-xs font-semibold uppercase text-slate-400 dark:text-slate-500 xl:leading-8">{{
+                        formatDate(post.created_at) }} , {{ formatTime(post.created_at) }}</div>
+                    </div>
+                    <div class="grow pb-6 border-b border-slate-200 dark:border-slate-700">
+                      <header>
+                        <div class="flex justify-between">
+                          <div>
+                            <h2 class="text-2xl text-slate-800 dark:text-slate-100 font-bold mb-3">{{ post.title }}</h2>
+                            <div class="flex flex-nowrap items-center space-x-2 mb-4">
+                              <div class="flex items-center">
+                                <a class="block mr-2 shrink-0" href="#0">
+                                  <img class="rounded-full border-2 border-white dark:border-slate-800 box-content"
+                                    src="../../images/defaultdark.jpg" width="32" height="32" alt="User 04" />
+                                </a>
+                                <a class="block text-sm font-semibold text-slate-800 dark:text-slate-100" href="#0">
+                                  {{ post.user.name }}
+                                </a>
+                              </div>
+                              <div class="text-slate-400 dark:text-slate-600">·</div>
+                            </div>
+                          </div>
+                          <div>
+
+                            <div class="m-1.5">
+                              <!-- Start -->
+                              <div class="flex flex-wrap -space-x-px">
+                                <button
+                                  class="btn dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300" @click="editPost(post)">
+                                  <svg class="w-4 h-4 fill-current text-slate-500 dark:text-slate-400 shrink-0"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                      d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM4.6 14H2v-2.6l6-6L10.6 8l-6 6zM12 6.6L9.4 4 11 2.4 13.6 5 12 6.6z" />
+                                  </svg>
+                                  <span class="ml-2">Edit Content</span>
+                                </button>
+                                <button
+                                  class="btn dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-rose-500" @click.stop="openDeleteModal(post.id , post.title)">
+                                  <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 16 16">
+                                    <path
+                                      d="M5 7h2v6H5V7zm4 0h2v6H9V7zm3-6v2h4v2h-1v10c0 .6-.4 1-1 1H2c-.6 0-1-.4-1-1V5H0V3h4V1c0-.6.4-1 1-1h6c.6 0 1 .4 1 1zM6 2v1h4V2H6zm7 3H3v9h10V5z" />
+                                  </svg>
+                                  <span class="ml-2">Delete</span>
+                                </button>
+                              </div>
+                              <!-- End -->
+                            </div>
+
+                          </div>
+                        </div>
+
+                      </header>
+                      <div class="space-y-3 text-slate-500">
+                        <p>{{ post.body }}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- end post -->
+
+
+                  <!-- modal delete -->
+                  <ModalBlank id="danger-modal" :modalOpen="dangerModalOpen" @close-modal="closeDeleteModal">
+                      <div class="p-5 flex space-x-4">
+                        <!-- Icon -->
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100 dark:bg-rose-500/30">
+                          <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
+                            <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                          </svg>
+                        </div>
+                        <!-- Content -->
+                        <div class="w-moz-available">
+                          <!-- Modal header -->
+                          <div class="mb-2">
+                            <div class="text-lg font-semibold text-slate-800 dark:text-slate-100">Delete Post {{ modalPost.title }} ?</div>
+                          </div>
+                          <!-- Modal content -->
+                          <div class="text-sm mb-10">
+                            <div class="space-y-2 text-slate-500">
+                              <p>Are You Sure Want To Delete It ?</p>
+                            </div>
+                          </div>
+                          <!-- Modal footer -->
+                          <div class="flex flex-wrap justify-end space-x-2">
+                            <button class="btn-sm border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300" @click.stop="closeDeleteModal">Cancel</button>
+                            <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white" @click="deletePostAndCloseModal">Yes, Delete it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </ModalBlank>
+
+
+                </article><!-- end for data -->
+              </div>
+
+              <!-- Pagination -->
+              <div class="xl:pl-32  mt-6">
+                <PaginationClassic />
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+
+  </div>
 </template>

@@ -35,7 +35,7 @@ const submit = () => {
                     <div class="flex-1">
                         <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
                             <!-- Logo -->
-                            <router-link class="block" to="/">
+                            <a class="block" href="/">
                                 <svg width="32" height="32" viewBox="0 0 32 32">
                                     <defs>
                                         <linearGradient x1="28.538%" y1="20.229%" x2="100%" y2="108.156%" id="logo-a">
@@ -58,7 +58,7 @@ const submit = () => {
                                         d="M2.223 24.14L29.777 7.86A15.926 15.926 0 0132 16c0 8.837-7.163 16-16 16-5.864 0-10.991-3.154-13.777-7.86z"
                                         fill="url(#logo-b)" />
                                 </svg>
-                            </router-link>
+                            </a>
                         </div>
                     </div>
 
