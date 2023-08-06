@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\WelcomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,7 @@ use App\Http\Controllers\PostController;
 |
 */
 
-Route::get('/', [PostController::class , 'welcome']  );
+Route::get('/', [WelcomeController::class , 'welcome']  );
 
 Route::middleware([
     'auth:sanctum',
