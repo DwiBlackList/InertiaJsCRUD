@@ -132,7 +132,7 @@ const submit = () => {
                         <!-- Footer -->
                         <div class="pt-5 mt-6 border-t border-slate-200 dark:border-slate-700">
                             <div class="text-sm">
-                                Have an account? 
+                                Have an account?
                                 <Link :href="route('login')"
                                     class="font-medium text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400">
                                 Sign In.

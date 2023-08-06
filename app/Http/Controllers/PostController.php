@@ -34,7 +34,7 @@ class PostController extends Controller
 
     public function index()
     {
-        $data = Post::with('user')->where('user_id' , '=' , Auth::user()->id)->get();
+        $data = Post::with('user')->where('user_id', '=', Auth::user()->id)->get();
         return Inertia::render('Posts', ['data' => $data]);
     }
 
@@ -57,7 +57,7 @@ class PostController extends Controller
             'user_id' => Auth::user()->id,
         ]);
 
-        if($post) {
+        if ($post) {
             return redirect()->route('posts.index');
         }
     }
@@ -82,7 +82,7 @@ class PostController extends Controller
             'body'   => $request->body
         ]);
 
-        if($post) {
+        if ($post) {
             return redirect()->back();
         }
         // dd('test');
@@ -94,7 +94,7 @@ class PostController extends Controller
      * @return Response
      */
 
-    public function destroy(Request $request , $id)
+    public function destroy(Request $request, $id)
     {
         // if ($request->has('id')) {
         //     Post::find($request->input('id'))->delete();

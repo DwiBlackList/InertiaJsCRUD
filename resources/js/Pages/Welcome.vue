@@ -46,7 +46,8 @@ function formatTime(timestamp) {
         <!-- end of navbar-->
 
         <!-- Content area -->
-        <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+        <div
+            class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
 
             <!-- Site header -->
             <!-- Page header -->
@@ -87,7 +88,8 @@ function formatTime(timestamp) {
                                                     <div class="flex items-center">
                                                         <a class="block mr-2 shrink-0" href="#0">
                                                             <img class="rounded-full border-2 border-white dark:border-slate-800 box-content"
-                                                                src="../../images/defaultdark.jpg" width="32" height="32" alt="User 04" />
+                                                                src="../../images/defaultdark.jpg" width="32" height="32"
+                                                                alt="User 04" />
                                                         </a>
                                                         <a class="block text-sm font-semibold text-slate-800 dark:text-slate-100"
                                                             href="#0">

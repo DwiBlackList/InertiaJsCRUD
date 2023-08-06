@@ -96,14 +96,14 @@ function closeEditModal() {
 }
 function updatePostAndCloseModal() {
   // Implement your update post logic here
-  
+
   let title = editedPost.value.title;
   let body = editedPost.value.body;
-  
+
   console.log('id:', editedPost.value.id);
   console.log('title:', title);
   console.log('body:', body);
-  
+
   // Send data
   Inertia.put(`/posts/${editedPost.value.id}`, {
     title: title,
@@ -151,7 +151,7 @@ function formatTime(timestamp) {
 
 <template>
   <div class="flex h-[100dvh] overflow-hidden">
-    
+
 
     <!-- Sidebar -->
 
@@ -170,13 +170,11 @@ function formatTime(timestamp) {
             <!-- Left: Title -->
             <div class="mb-4 sm:mb-0">
               <h1 class="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold">Your Post ✨</h1>
-              <TextInput id="title" v-model="searchQuery" type="text" class="mt-1 block w-full"
-            placeholder="Search Posts..." />
             </div>
 
             <!-- Right: Actions -->
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-
+              <TextInput id="title" v-model="searchQuery" type="text" class="" placeholder="Search Posts..." />
               <!-- Add board button -->
               <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" aria-controls="create-post-modal"
                 @click.stop="createPostModal = true">
@@ -298,7 +296,7 @@ function formatTime(timestamp) {
 
                   <!-- end post -->
                   <!-- Modal edit -->
-                  <ModalBasic id="edit-modal" :modalOpen="editModalOpen" @close-modal=" false " title="Edit Post">
+                  <ModalBasic id="edit-modal" :modalOpen="editModalOpen" @close-modal=" false" title="Edit Post">
                     <form @submit.prevent="updatePostAndCloseModal">
 
                       <!-- Modal content -->
@@ -326,15 +324,15 @@ function formatTime(timestamp) {
                       <div class="px-5 py-4 border-t border-slate-200 dark:border-slate-700">
                         <div class="flex flex-wrap justify-end space-x-2">
                           <button
-                            class="btn-sm border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300" @click.stop="editModalOpen = false"
-                            >Cancel</button>
+                            class="btn-sm border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300"
+                            @click.stop="editModalOpen = false">Cancel</button>
                           <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white" type="submit">Save</button>
                         </div>
                       </div>
                     </form>
                   </ModalBasic>
 
-                  
+
                   <!-- modal delete -->
                   <ModalBlank id="danger-modal" :modalOpen="dangerModalOpen" @close-modal="closeDeleteModal">
                     <div class="p-5 flex space-x-4">
