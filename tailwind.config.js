@@ -20,6 +20,12 @@ export default {
             width: {
                 'moz-available': '-moz-available',
             },
+            backgroundColor: {
+                'dark': 'rgb(15 23 42 / 0.3)',
+            },
+            borderColor: {
+                'dark': 'rgb(51 65 85 / var(--tw-border-opacity))',
+            },
         },
     },
 
