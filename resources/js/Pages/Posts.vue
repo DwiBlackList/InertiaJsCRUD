@@ -94,15 +94,67 @@ function deletePostAndCloseModal() {
 
 
 // edit
+const editModalOpen = ref(false);
+
 // Define the 'editedPost' reactive property to store the edited post data
-const editedPost = reactive({
+const editedPost = ref({
   id: null,
   title: '',
-  body: '',
+  body: ''
 });
+
+function openEditModal(post) {
+  editedPost.value.id = post.id;
+  editedPost.value.title = post.title;
+  editedPost.value.body = post.body;
+  editModalOpen.value = true;
+}
+function closeEditModal() {
+  editModalOpen.value = false;
+}
+// function updatePostAndCloseModal() {
+//   // Implement your update post logic here
+  
+//   let title = editedPost.title
+//   let body = editedPost.body
+//   console.log('id:', editedPost.id);
+//   console.log('title:', title);
+//   console.log('body:', body);
+//   //send data
+//   Inertia.put(`/posts/${editedPost.id}`, {
+//     title: title,
+//     body: body
+//   })
+//   // After updating, close the modal
+//   closeEditModal();
+// }
+function updatePostAndCloseModal() {
+  // Implement your update post logic here
+  
+  let title = editedPost.value.title;
+  let body = editedPost.value.body;
+  
+  console.log('id:', editedPost.value.id);
+  console.log('title:', title);
+  console.log('body:', body);
+  
+  // Send data
+  Inertia.put(`/posts/${editedPost.value.id}`, {
+    title: title,
+    body: body
+  }).then(() => {
+    // After updating, close the modal
+    closeEditModal();
+  }).catch(error => {
+    console.error('Error updating post:', error);
+    // Handle the error here, such as displaying an error message to the user
+  });
+}
+
 
 // Function to open the modal for editing a post
 function editPost(post) {
+  editModal.value = true; // Open the modal
   editedPost.id = post.id;
   editedPost.title = post.title;
   editedPost.body = post.body;
@@ -119,7 +171,6 @@ function updatePost() {
     title: title,
     body: body
   })
-
 }
 
 function closeModal() {
@@ -330,7 +381,7 @@ function formatTime(timestamp) {
             <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
 
               <!-- Add board button -->
-              <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" aria-controls="feedback-modal"
+              <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" aria-controls="create-post-modal"
                 @click.stop="createPostModal = true">
                 <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
                   <path
@@ -338,7 +389,7 @@ function formatTime(timestamp) {
                 </svg>
                 <span class="ml-2">Add Post</span>
               </button>
-              <ModalBasic id="feedback-modal" :modalOpen="createPostModal" @close-modal="createPostModal = false"
+              <ModalBasic id="create-post-modal" :modalOpen="createPostModal" @close-modal="createPostModal = false"
                 title="Send New Post">
                 <form @submit.prevent="submit">
 
@@ -351,7 +402,8 @@ function formatTime(timestamp) {
                       <div>
                         <label class="block text-sm font-medium mb-1 text-slate-400" for="name">title <span
                             class="text-rose-500">*</span></label>
-                        <input id="title" class="form-input w-full px-2 py-1 bg-dark border-dark" type="text" required v-model="form.title" />
+                        <input id="title" class="form-input w-full px-2 py-1 bg-dark border-dark" type="text" required
+                          v-model="form.title" />
                       </div>
                       <div>
                         <label class="block text-sm font-medium mb-1 text-slate-400" for="feedback">Message <span
@@ -416,7 +468,7 @@ function formatTime(timestamp) {
                               <div class="flex flex-wrap -space-x-px">
                                 <button
                                   class="btn dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300"
-                                  @click="editPost(post)">
+                                  aria-controls="create-post-modal" @click.stop="openEditModal(post)">
                                   <svg class="w-4 h-4 fill-current text-slate-500 dark:text-slate-400 shrink-0"
                                     viewBox="0 0 16 16">
                                     <path
@@ -448,8 +500,44 @@ function formatTime(timestamp) {
                   </div>
 
                   <!-- end post -->
+                  <!-- Modal edit -->
+                  <ModalBasic id="edit-modal" :modalOpen="editModalOpen" @close-modal=" false " title="Edit Post">
+                    <form @submit.prevent="updatePostAndCloseModal">
 
+                      <!-- Modal content -->
+                      <div class="px-5 py-4">
+                        <div class="text-sm">
+                          <div class="font-medium text-slate-800 dark:text-slate-100 mb-3">Edit Your Post Here
+                          </div>
+                        </div>
+                        <div class="space-y-3">
+                          <div>
+                            <label class="block text-sm font-medium mb-1 text-slate-400" for="name">title <span
+                                class="text-rose-500">*</span></label>
+                            <input id="title" v-model="editedPost.title"
+                              class="form-input w-full px-2 py-1 bg-dark border-dark" type="text" required />
+                          </div>
+                          <div>
+                            <label class="block text-sm font-medium mb-1 text-slate-400" for="feedback">Message <span
+                                class="text-rose-500">*</span></label>
+                            <textarea id="feedback" v-model="editedPost.body"
+                              class="form-textarea w-full px-2 py-1 bg-dark border-dark" rows="4" required></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- Modal footer -->
+                      <div class="px-5 py-4 border-t border-slate-200 dark:border-slate-700">
+                        <div class="flex flex-wrap justify-end space-x-2">
+                          <button
+                            class="btn-sm border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300" @click.stop="editModalOpen = false"
+                            >Cancel</button>
+                          <button class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white" type="submit">Save</button>
+                        </div>
+                      </div>
+                    </form>
+                  </ModalBasic>
 
+                  
                   <!-- modal delete -->
                   <ModalBlank id="danger-modal" :modalOpen="dangerModalOpen" @close-modal="closeDeleteModal">
                     <div class="p-5 flex space-x-4">
