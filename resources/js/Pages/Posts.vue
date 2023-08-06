@@ -1,20 +1,19 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
 
 // import Sidebar from '@/Components/Sidebar.vue';
 import Header from '@/Components/Header.vue';
 import ModalBlank from '@/Components/ModalBlank.vue';
 import ModalBasic from '@/Components/ModalBasic.vue'
 import PaginationClassic from '@/Components/PaginationClassic.vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { reactive, onMounted, ref, computed } from 'vue';
+import { Inertia } from '@inertiajs/inertia';
+import TextInput from '@/Components/TextInput.vue';
+
+
 
 
 // Import 'defineProps' from Vue to access the 'data' prop
-import { reactive, onMounted, ref, computed } from 'vue';
-
-import { Inertia } from '@inertiajs/inertia';
-
 // Define the 'data' prop
 const props = defineProps({
   data: {
@@ -23,14 +22,8 @@ const props = defineProps({
   }
 });
 
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import Checkbox from '@/Components/Checkbox.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-
+// Create
+const createPostModal = ref(false)
 const form = useForm({
   title: '',
   body: '',
@@ -41,19 +34,10 @@ const submit = () => {
   createPostModal.value = false; // Close the modal after deleting
 };
 
-const createPostModal = ref(false)
 
 // delete
-// function destroy(id) {
-//   if (confirm("Are you sure you want to Delete")) {
-//     form.delete(route('posts.destroy', id));
-//   }
-// }
 // Define a reactive property to track if the delete modal is open
 const dangerModalOpen = ref(false);
-
-let postIdToDelete = null; // Store the post ID to delete
-let postTitleToDelete = null; // Store the post ID to delete
 
 let modalPost = ref({
   id: null,
@@ -63,8 +47,6 @@ let modalPost = ref({
 // Function to open the delete modal and store the post ID
 function openDeleteModal(postId, postTitle) {
   dangerModalOpen.value = true; // Open the modal
-  // postTitleToDelete = postTitle; // Store the post ID
-  // postIdToDelete = postId; // Store the post ID
   modalPost.value.id = postId;
   modalPost.value.title = postTitle;
 }
@@ -112,22 +94,6 @@ function openEditModal(post) {
 function closeEditModal() {
   editModalOpen.value = false;
 }
-// function updatePostAndCloseModal() {
-//   // Implement your update post logic here
-  
-//   let title = editedPost.title
-//   let body = editedPost.body
-//   console.log('id:', editedPost.id);
-//   console.log('title:', title);
-//   console.log('body:', body);
-//   //send data
-//   Inertia.put(`/posts/${editedPost.id}`, {
-//     title: title,
-//     body: body
-//   })
-//   // After updating, close the modal
-//   closeEditModal();
-// }
 function updatePostAndCloseModal() {
   // Implement your update post logic here
   
@@ -149,34 +115,6 @@ function updatePostAndCloseModal() {
     console.error('Error updating post:', error);
     // Handle the error here, such as displaying an error message to the user
   });
-}
-
-
-// Function to open the modal for editing a post
-function editPost(post) {
-  editModal.value = true; // Open the modal
-  editedPost.id = post.id;
-  editedPost.title = post.title;
-  editedPost.body = post.body;
-}
-
-function updatePost() {
-
-  //define variable 
-  let title = editedPost.title
-  let body = editedPost.body
-
-  //send data
-  Inertia.put(`/posts/${editedPost.id}`, {
-    title: title,
-    body: body
-  })
-}
-
-function closeModal() {
-  editedPost.id = null;
-  editedPost.title = '';
-  editedPost.body = '';
 }
 
 // filter data
@@ -211,152 +149,9 @@ function formatTime(timestamp) {
 // const sidebarOpen = ref(true)
 </script>
 
-<!-- <template>
-  <AppLayout title="Posts">
-    <template #header>
-      <div class="flex justify-between">
-        <div class="flex items-center">
-          <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            Post
-          </h2>
-
-        </div>
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg text-white">
-          <TextInput id="title" v-model="searchQuery" type="text" class="mt-1 block w-full"
-            placeholder="Search Posts..." />
-        </div>
-      </div>
-    </template>
-
-    <div class="max-w-7xl py-12 sm:px-6 lg:px-8 mt-5 mx-auto bg-gray-800 p-6 rounded shadow-md">
-      <h2 class="text-2xl font-semibold mb-4 text-white">Make Post</h2>
-      <form @submit.prevent="submit">
-        <div class="mb-4">
-          <label class="block text-gray-300 font-semibold mb-1" for="title">Title :</label>
-          <input class="w-full border rounded py-2 px-3 bg-gray-700 text-white" type="text" id="title" name="name"
-            placeholder="Your Title" v-model="form.title" required>
-        </div>
-        <div class="mb-4">
-          <label class="block text-gray-300 font-semibold mb-1" for="body">Content :</label>
-          <textarea class="w-full border rounded py-2 px-3 bg-gray-700 text-white" id="body" name="body" rows="4"
-            placeholder="Your Content" v-model="form.body" required></textarea>
-        </div>
-        <div class="flex justify-between">
-          <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-            type="submit">Submit</button>
-          <button class="bg-gray-600 hover:bg-gray-700 text-gray-300 font-semibold py-2 px-4 rounded"
-            type="reset">Reset</button>
-        </div>
-      </form>
-    </div>
-
-   
-
-    <div v-for="post in filteredPosts" :key="post.id">
-      <div class="max-w-7xl mx-auto p-6 lg:p-8">
-        <div class="mt-16 mx-auto">
-          <div class="grid grid-cols-1 md:grid-cols-1 gap-6 lg:gap-8">
-            <div
-              class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-              <div class="w-full">
-                <div class="flex justify-between">
-
-                  <div>
-                    <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">
-                      {{ post.title }}
-                    </h2>
-                  </div>
-
-                  <div class="text-white">
-                    <Dropdown align="right" width="48">
-                      <template #trigger>
-                        <span class="inline-flex rounded-md">
-                          <button type="button"
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150">
-                            Actions
-
-                            <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                              viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                            </svg>
-                          </button>
-                        </span>
-                      </template>
-
-                      <template #content>
-                        <div class="block px-4 py-2 text-xs text-gray-400">
-                          Manage Post
-                        </div>
-
-                        <div
-                          class="block px-4 py-2 text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                          @click="editPost(post)">
-                          Edit
-                        </div>
-                        <div
-                          class="block px-4 py-2 text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                          @click="destroy(post.id)">
-                          Delete
-                        </div>
-                      </template>
-                    </Dropdown>
-                  </div>
-                </div>
-                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                  {{ post.body }}
-                </p>
-                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm flex justify-between leading-relaxed">
-                <div>
-                  {{ post.user.name }}
-                </div>
-                <div>
-                  {{ formatDate(post.created_at) }}
-                </div>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <teleport to="body">
-        <div v-if="editedPost.id !== null" class="fixed inset-0 flex items-center justify-center">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-1/2">
-            <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-300 ">Edit Post</h3>
-
-
-            <div v-if="editedPost.id !== null"
-              class="max-w-7xl sm:px-6 lg:px-8 mt-5 mx-auto bg-gray-800 p-6 rounded shadow-md">
-              <form @submit.prevent="updatePost">
-                <div class="mb-4">
-                  <label class="block text-gray-300 font-semibold mb-1" for="title">Title :</label>
-                  <input class="w-full border rounded py-2 px-3 bg-gray-700 text-white" type="text" name="name"
-                    placeholder="Your Title" id="edit-title" v-model="editedPost.title" required>
-                </div>
-                <div class="mb-4">
-                  <label class="block text-gray-300 font-semibold mb-1" for="body">Content :</label>
-                  <textarea class="w-full border rounded py-2 px-3 bg-gray-700 text-white" id="body" name="body" rows="4"
-                    placeholder="Your Content" v-model="editedPost.body" required></textarea>
-                </div>
-                <div class="flex justify-between">
-                  <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-                    type="submit">Submit</button>
-                  <button class="bg-gray-600 hover:bg-gray-700 text-gray-300 font-semibold py-2 px-4 rounded"
-                    @click="closeModal">Cancel</button>
-                </div>
-              </form>
-
-            </div>
-          </div>
-        </div>
-      </teleport>
-
-    </div>
-  </AppLayout>
-</template> -->
-
 <template>
   <div class="flex h-[100dvh] overflow-hidden">
+    
 
     <!-- Sidebar -->
 
@@ -375,6 +170,8 @@ function formatTime(timestamp) {
             <!-- Left: Title -->
             <div class="mb-4 sm:mb-0">
               <h1 class="text-2xl md:text-3xl text-slate-800 dark:text-slate-100 font-bold">Your Post ✨</h1>
+              <TextInput id="title" v-model="searchQuery" type="text" class="mt-1 block w-full"
+            placeholder="Search Posts..." />
             </div>
 
             <!-- Right: Actions -->

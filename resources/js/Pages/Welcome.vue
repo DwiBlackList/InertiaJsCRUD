@@ -11,28 +11,6 @@ defineProps({
     data: Array,
 });
 
-// const props = defineProps({
-//   canLogin: Boolean,
-//   canRegister: Boolean,
-//   laravelVersion: String,
-//   phpVersion: String,
-//   data: Object,
-//   // Add pagination props
-//   currentPage: Number,
-//   lastPage: Number,
-//   perPage: Number,
-//   total: Number,
-//   // ... other pagination-related props
-// });
-
-// // Define any reactive variables or methods here
-
-// // Define your methods here
-// const fetchData = (page) => {
-//   // Fetch paginated data from the server using Inertia.js
-//   this.$inertia.get(route("your.route.name"), { page: page });
-// };
-
 // Function to format the date as only the date
 function formatDate(timestamp) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
